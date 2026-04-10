@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BiteCheck - Futuristic Calorie Tracker</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{
+margin:0;
+background:radial-gradient(circle at top,#0b1220,#05070f);
+color:white;
+display:flex;
+justify-content:center;
+min-height:100vh;
+padding:20px;
+}
+.container{
+width:100%;max-width:520px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(12px);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:20px;
+padding:20px;
+box-shadow:0 0 40px rgba(0,255,255,0.08);
+}
+h1{text-align:center;margin-bottom:10px}
+.subtitle{text-align:center;font-size:12px;opacity:0.7;margin-bottom:20px}
+.row{display:flex;gap:10px;margin-bottom:10px}
+input,select{
+flex:1;padding:12px;border-radius:12px;border:none;
+background:rgba(255,255,255,0.08);color:white;outline:none
+}
+input::placeholder{color:#aaa}
+button{
+width:100%;padding:12px;border:none;border-radius:12px;
+background:linear-gradient(90deg,#00f5ff,#0088ff);
+color:black;font-weight:bold;cursor:pointer;margin-top:10px
+}
+button:hover{opacity:0.9}
+.table{margin-top:15px;width:100%;border-collapse:collapse}
+td,th{padding:8px;text-align:center;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.total{margin-top:15px;padding:10px;background:rgba(0,255,255,0.1);border-radius:12px;text-align:center}
+.stats{margin-top:15px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.card{
+background:rgba(255,255,255,0.06);
+border:1px solid rgba(255,255,255,0.1);
+padding:10px;border-radius:12px;text-align:center
+}
+.card h3{margin:0;font-size:14px;opacity:0.7}
+.card p{margin:5px 0 0;font-size:16px;font-weight:bold}
+
+/* Futuristic Credits Panel */
+.credits{
+margin-top:18px;
+padding:14px;
+border-radius:16px;
+background:linear-gradient(135deg,rgba(0,255,255,0.08),rgba(0,136,255,0.05));
+border:1px solid rgba(0,255,255,0.2);
+box-shadow:0 0 20px rgba(0,255,255,0.08);
+}
+.credits h3{
+text-align:center;
+margin:0 0 10px;
+font-size:13px;
+letter-spacing:1px;
+opacity:0.8;
+}
+.names{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+.name{
+padding:10px;
+border-radius:10px;
+text-align:center;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+font-size:14px;
+letter-spacing:0.5px;
+}
+.name:nth-child(1){box-shadow:0 0 10px rgba(0,255,255,0.2)}
+.name:nth-child(2){box-shadow:0 0 10px rgba(0,136,255,0.2)}
+.name:nth-child(3){box-shadow:0 0 10px rgba(255,255,255,0.15)}
+
+.footer{margin-top:15px;font-size:12px;opacity:0.7;text-align:center;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>⚡ BiteCheck</h1>
+<div class="subtitle">Futuristic Calorie + Macro Tracker</div>
+
+<div class="row">
+<input id="food" placeholder="Food name (e.g. Chicken)">
+<select id="type">
+<option value="protein">Protein</option>
+<option value="carbs">Carbs</option>
+<option value="fat">Fat</option>
+</select>
+</div>
+
+<div class="row">
+<input id="grams" type="number" placeholder="Grams">
+<button onclick="addFood()">Add</button>
+</div>
+
+<table class="table">
+<thead>
+<tr><th>Food</th><th>Type</th><th>g</th><th>Cal</th></tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+
+<div class="total" id="total">Total Calories: 0</div>
+
+<div class="stats">
+<div class="card">
+<h3>Items</h3>
+<p id="itemsCount">0</p>
+</div>
+<div class="card">
+<h3>Avg Calories</h3>
+<p id="avgCal">0</p>
+</div>
+<div class="card">
+<h3>Meals</h3>
+<p id="meals">1</p>
+</div>
+</div>
+
+<button onclick="resetAll()">Reset</button>
+
+<div class="credits">
+<h3>CREATED BY</h3>
+<div class="names">
+<div class="name">Mohammed Maher</div>
+<div class="name">Yousef Atris</div>
+<div class="name">Mohammed Ali</div>
+</div>
+</div>
+
+<div class="footer">
+💡 Track consistently to see real progress over time.<br>
+⚡ BiteCheck helps you stay in control of your macros easily.
+</div>
+</div>
+
+<script>
+let data=[];
+const calMap={protein:4,carbs:4,fat:9};
+
+function addFood(){
+let food=document.getElementById('food').value;
+let type=document.getElementById('type').value;
+let grams=parseFloat(document.getElementById('grams').value);
+if(!food||!grams)return;
+let cal=grams*calMap[type];
+data.push({food,type,grams,cal});
+render();
+document.getElementById('food').value="";
+document.getElementById('grams').value="";
+}
+
+function render(){
+let list=document.getElementById('list');
+list.innerHTML="";
+let total=0;
+data.forEach(item=>{
+total+=item.cal;
+list.innerHTML+=`<tr>
+<td>${item.food}</td>
+<td>${item.type}</td>
+<td>${item.grams}</td>
+<td>${item.cal.toFixed(0)}</td>
+</tr>`;
+});
+let avg = data.length ? total / data.length : 0;
+document.getElementById('total').innerText="Total Calories: "+total.toFixed(0);
+document.getElementById('itemsCount').innerText=data.length;
+document.getElementById('avgCal').innerText=avg.toFixed(0);
+document.getElementById('meals').innerText="1";
+}
+
+function resetAll(){
+data=[];render();
+}
+</script>
+
+</body>
+</html>
